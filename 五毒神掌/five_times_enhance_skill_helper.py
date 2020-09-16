@@ -77,7 +77,9 @@ if __name__ == '__main__':
     filename = 'database.json'
     data = get_data(filename)
     mapping = {'w': record, 'g': get_problem, 'l': list_problems, 'm': make_up}
-    while (operation := raw_input('w:记录 g:取出 l:查看日程 m:补记录>')) != 'q':
+    operation = ''
+    while (operation) != 'q':
+        operation = raw_input('w:记录 g:取出 l:查看日程 m:补记录>')
         if operation not in mapping:
             continue
         mapping[operation](data)
