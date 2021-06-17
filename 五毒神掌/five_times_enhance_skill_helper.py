@@ -50,6 +50,9 @@ def get_problem(data):
 
 def list_problems(data):
     print("===================日程表===================")
+    if not data:
+        print("")
+        return
     data = sorted(data.items())
     today = get_today()
     next_day = datetime.fromisoformat(data[0][0])
@@ -74,7 +77,7 @@ def make_up(data):
 
 
 if __name__ == '__main__':
-    filename = 'database.json'
+    filename = 'database_new_travel.json'
     data = get_data(filename)
     mapping = {'w': record, 'g': get_problem, 'l': list_problems, 'm': make_up}
     operation = ''
