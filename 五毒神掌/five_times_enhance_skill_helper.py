@@ -1,6 +1,9 @@
 # coding:utf-8
 __author__ = 'cwang14'
+
 import json
+import random
+
 from pip._vendor.distlib.compat import raw_input
 from datetime import datetime, timedelta
 
@@ -23,8 +26,8 @@ def write_data(filename, data):
 
 
 def record(data, specific_date=None):
-    inputs = raw_input('记录哪几题(空格分割)？')
-    problems = inputs.split(' ')
+    inputs = raw_input('记录哪一题？').replace(" ", "")
+    problems = [inputs]
     if specific_date:
         today = specific_date
     else:
@@ -76,13 +79,66 @@ def make_up(data):
     record(data, specific_date=specific_date)
 
 
+def enhance_memory(data):
+    today = datetime.now()
+    thirty_days_ago = today - timedelta(days=30)
+    old_problems = []
+
+    for date_str, problems in data.items():
+        problem_date = datetime.fromisoformat(date_str)
+        if problem_date < thirty_days_ago:
+            old_problems.extend(problems)
+    from termcolor import colored
+
+    print("")
+    print("")
+    print("==================================================")
+    if old_problems:
+        selected_problem = random.choice(old_problems)
+
+        print(colored("          加强记忆题目: ", "cyan", attrs=["bold"]) + colored(selected_problem, "red",
+                                                                                    attrs=["bold",
+                                                                                           "underline"]))
+    else:
+        print(colored("          没有找到 30 天之前的题目！", "red", attrs=["bold"]))
+
+    print("==================================================")
+    print("")
+    print("")
+
+
 if __name__ == '__main__':
-    filename = 'database_new_travel.json'
+    from termcolor import colored
+
+    filename = './五毒神掌/database_new_travel.json'
     data = get_data(filename)
-    mapping = {'w': record, 'g': get_problem, 'l': list_problems, 'm': make_up}
+    mapping = {'w': record, 'g': get_problem, 'l': list_problems, 'm': make_up, 'e': enhance_memory}
     operation = ''
+    date = sorted(data.items())
+    from termcolor import colored
+
+
+    def print_banner():
+        print(colored("=" * 50, "green"))
+        print(colored(" " * 10, "green") + colored("欢迎使用", "cyan", attrs=["bold"]) + colored("五毒神掌", "red",
+                                                                                                 attrs=["bold",
+                                                                                                        "underline"]))
+        print(colored("=" * 50, "green"))
+
+
+    print_banner()
+    # get how many days I keep doing this
+    today = get_today()
+    start_date = datetime.fromisoformat(date[0][0])
+    keep_days = (today - start_date).days
+    today = today.strftime("%Y-%m-%d")
+    if today in date:
+        print("今天已经记录过了哦！")
+    else:
+        print("今天还没有记录哦！")
+    print(f"从{date[0][0]}开始，你已经坚持了{keep_days}天")
     while (operation) != 'q':
-        operation = raw_input('w:记录 g:取出 l:查看日程 m:补记录>')
+        operation = raw_input('w:记录 g:取出 l:查看日程 m:补记录 e:加强记忆>')
         if operation not in mapping:
             continue
         mapping[operation](data)
